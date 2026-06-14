@@ -1,0 +1,1645 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>birthday</title>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;background:#060a1f;font-family:'Cormorant Garamond',serif;color:#fff5ee;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+
+/* ── Scroll container ── */
+#scroll-container{position:fixed;top:0;left:0;width:100%;height:100%;overflow-y:scroll;overflow-x:hidden;-webkit-overflow-scrolling:touch;scroll-snap-type:y mandatory;scroll-behavior:smooth;z-index:10;overscroll-behavior:none}
+#scroll-container::-webkit-scrollbar{display:none}
+
+/* ── Background layers ── */
+#bg-layer{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;background:linear-gradient(175deg,#060a1f 0%,#0c1533 30%,#12103a 55%,#1a0f35 75%,#060a1f 100%)}
+#aurora-layer{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;filter:blur(60px);opacity:.45;pointer-events:none;overflow:hidden}
+.aurora-band{position:absolute;height:35%;width:180%;border-radius:50%;left:-40%;mix-blend-mode:screen;will-change:transform}
+.aurora-band:nth-child(1){background:linear-gradient(90deg,transparent,rgba(74,160,140,.35),transparent);top:5%;animation:auroraDrift 22s ease-in-out infinite alternate}
+.aurora-band:nth-child(2){background:linear-gradient(90deg,transparent,rgba(140,110,180,.3),transparent);top:35%;animation:auroraDrift 28s ease-in-out infinite alternate;animation-delay:-8s}
+.aurora-band:nth-child(3){background:linear-gradient(90deg,transparent,rgba(200,140,170,.25),transparent);top:60%;animation:auroraDrift 24s ease-in-out infinite alternate;animation-delay:-14s}
+.aurora-band:nth-child(4){background:linear-gradient(90deg,transparent,rgba(100,180,200,.2),transparent);top:78%;animation:auroraDrift 30s ease-in-out infinite alternate;animation-delay:-4s}
+@keyframes auroraDrift{0%{transform:translateX(-5%) scaleY(1)}50%{transform:translateX(8%) scaleY(1.15)}100%{transform:translateX(-3%) scaleY(.9)}}
+
+#star-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:2;pointer-events:none}
+#petal-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:3;pointer-events:none}
+
+/* ── Screen sections ── */
+.section{height:100vh;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:5vw;position:relative;scroll-snap-align:start;overflow:hidden}
+.section-inner{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
+
+/* ── Screen 1: Greeting ── */
+.greeting-text{font-family:'Dancing Script',cursive;font-size:clamp(1.6rem,5.5vw,3.2rem);color:#fff5ee;text-align:center;line-height:1.6;letter-spacing:.08em;opacity:0;animation:gentleRise 2.4s ease .6s forwards;text-shadow:0 0 40px rgba(255,245,238,.15),0 0 80px rgba(200,170,220,.1)}
+.greeting-hint{position:absolute;bottom:10vh;font-family:'Cormorant Garamond',serif;font-size:clamp(.85rem,2.2vw,1.1rem);color:rgba(255,245,238,.35);letter-spacing:.15em;opacity:0;animation:gentleRise 2s ease 2s forwards, pulseHint 3s ease-in-out 2s infinite}
+@keyframes gentleRise{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes pulseHint{0%,100%{opacity:.3}50%{opacity:.65}}
+
+/* ── Screen 2: Birthday ── */
+.birthday-wrapper{opacity:0;transition:opacity 1.2s ease}
+.birthday-wrapper.visible{opacity:1}
+.birthday-title{font-family:'Playfair Display',serif;font-size:clamp(2.2rem,8vw,4.5rem);color:#d4af37;text-align:center;letter-spacing:.1em;text-shadow:0 0 60px rgba(212,175,55,.2),0 0 120px rgba(212,175,55,.1);position:relative}
+.birthday-title .char{display:inline-block;opacity:0;transform:translateY(30px) rotateX(-20deg);animation:charReveal .7s ease forwards}
+@keyframes charReveal{0%{opacity:0;transform:translateY(30px) rotateX(-20deg)}100%{opacity:1;transform:translateY(0) rotateX(0)}}
+.birthday-sub{font-family:'Dancing Script',cursive;font-size:clamp(1rem,3vw,1.8rem);color:rgba(255,245,238,.5);margin-top:2rem;opacity:0;transition:opacity 1.5s ease 2.5s}
+.birthday-sub.visible{opacity:1}
+
+/* ── Screen 3: Cake ── */
+.cake-section-inner{opacity:0;transition:opacity 1.2s ease}
+.cake-section-inner.visible{opacity:1}
+.cake-container{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;width:80%;max-width:360px}
+
+.cake-svg-wrap{position:relative;width:clamp(150px,45vw,260px);height:clamp(170px,50vw,290px);cursor:pointer;transition:transform .35s cubic-bezier(.34,1.56,.64,1);touch-action:manipulation}
+.cake-svg-wrap.bounce{animation:cakeBounce .45s cubic-bezier(.34,1.56,.64,1)}
+@keyframes cakeBounce{0%{transform:translateY(0) scale(1)}30%{transform:translateY(-12px) scale(1.04)}60%{transform:translateY(-3px) scale(.98)}100%{transform:translateY(0) scale(1)}}
+
+.cake-svg-wrap svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 4px 30px rgba(255,248,240,.08))}
+.cake-svg-wrap svg .cake-shape{transition:all .3s}
+
+/* Candle & flame */
+.candle-group{transition:transform .3s}
+.candle-wick-svg{transform-origin:bottom center}
+.flame-svg{transform-origin:center bottom;animation:flameFlicker 1.8s ease-in-out infinite alternate,flameBreathe 4s ease-in-out infinite}
+.flame-svg.flicker-once{animation:flameFlickerOnce .5s ease 2 !important}
+@keyframes flameFlicker{0%{transform:translate(-12px,-34px) scaleY(1)}25%{transform:translate(-10px,-36px) scaleY(1.07)}50%{transform:translate(-14px,-32px) scaleY(.96)}75%{transform:translate(-11px,-35px) scaleY(1.04)}100%{transform:translate(-12px,-34px) scaleY(.98)}}
+@keyframes flameBreathe{0%,100%{opacity:.85}50%{opacity:1}}
+@keyframes flameFlickerOnce{0%{transform:translate(-12px,-34px) scaleY(1)}20%{transform:translate(-8px,-40px) scaleY(1.3) scaleX(.85)}50%{transform:translate(-16px,-28px) scaleY(.8) scaleX(1.15)}80%{transform:translate(-9px,-37px) scaleY(1.15)}100%{transform:translate(-12px,-34px) scaleY(1)}}
+
+/* Starlight dots overlay */
+.cake-sparkle{position:absolute;width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,.7);box-shadow:0 0 5px rgba(255,255,255,.5),0 0 12px rgba(255,245,238,.2);pointer-events:none;animation:spSparkle 3s ease-in-out infinite}
+.cake-sparkle:nth-child(1){bottom:28%;left:30%;animation-delay:-.4s}
+.cake-sparkle:nth-child(2){bottom:40%;left:58%;width:2px;height:2px;animation-delay:-1.2s}
+.cake-sparkle:nth-child(3){bottom:18%;left:48%;width:2.5px;height:2.5px;animation-delay:-2s}
+.cake-sparkle:nth-child(4){bottom:50%;left:68%;animation-delay:-.8s}
+.cake-sparkle:nth-child(5){bottom:60%;left:38%;width:2px;height:2px;animation-delay:-1.6s}
+.cake-sparkle:nth-child(6){bottom:35%;left:72%;width:2.5px;height:2.5px;animation-delay:-2.4s}
+.cake-sparkle:nth-child(7){bottom:65%;left:25%;animation-delay:-.2s}
+@keyframes spSparkle{0%,100%{opacity:.2;transform:scale(1)}50%{opacity:.9;transform:scale(1.5)}}
+
+.cake-glow{position:absolute;top:-5%;left:-8%;width:116%;height:110%;background:radial-gradient(ellipse at 50% 30%,rgba(255,215,0,.07),transparent 65%);opacity:0;transition:opacity 1.2s;pointer-events:none;border-radius:50%}
+.cake-glow.active{opacity:1}
+
+.cake-label{font-family:'Dancing Script',cursive;color:rgba(255,245,238,.45);font-size:clamp(.85rem,2.4vw,1.15rem);margin-top:clamp(4px,1vh,10px);letter-spacing:.1em;opacity:0;transition:opacity 1.5s ease}
+.cake-label.show{opacity:1}
+
+.wish-text{font-family:'Dancing Script',cursive;color:rgba(212,175,55,.6);font-size:clamp(.85rem,2.5vw,1.15rem);margin-top:clamp(6px,1.2vh,12px);opacity:0;transition:opacity 1.5s ease;text-align:center;letter-spacing:.04em}
+.wish-text.show{opacity:1}
+
+.emoji-bar{display:flex;gap:clamp(14px,3.5vw,30px);margin-top:clamp(12px,3vh,28px);opacity:0;transition:opacity 1s ease;pointer-events:none}
+.emoji-bar.show{opacity:1;pointer-events:auto}
+.emoji-btn{font-size:clamp(1.8rem,5.5vw,2.8rem);cursor:pointer;padding:clamp(4px,1vw,8px) clamp(8px,1.8vw,16px);background:rgba(255,245,238,.04);border:1px solid rgba(255,245,238,.08);border-radius:30px;transition:all .4s ease;transform:scale(1);touch-action:manipulation}
+.emoji-btn:active{transform:scale(.88)}
+
+.blessing-text{position:fixed;z-index:50;pointer-events:none;font-family:'Dancing Script',cursive;color:#d4af37;font-size:clamp(1.1rem,3.2vw,1.6rem);text-align:center;letter-spacing:.06em;text-shadow:0 0 20px rgba(212,175,55,.3),0 0 50px rgba(212,175,55,.1);animation:blessingFloat 2.5s ease forwards}
+@keyframes blessingFloat{0%{opacity:0;transform:translateY(0) scale(.7);filter:blur(2px)}15%{opacity:1;transform:translateY(-10px) scale(1.05);filter:blur(0)}40%{opacity:1;transform:translateY(-30px) scale(1);filter:blur(0)}100%{opacity:0;transform:translateY(-70px) scale(.6);filter:blur(4px)}}
+
+.golden-star{position:fixed;z-index:48;pointer-events:none;color:#d4af37;font-size:clamp(.6rem,1.5vw,1rem);animation:goldenStarFall var(--fall-dur,3s) ease-in forwards}
+@keyframes goldenStarFall{0%{opacity:0;transform:translateY(0) rotate(0deg) scale(.5)}10%{opacity:1;transform:translateY(2vh) rotate(30deg) scale(1)}100%{opacity:0;transform:translateY(calc(100vh + 20px)) rotate(180deg) scale(.3)}}
+
+/* ── Screen 4: Poetry ── */
+.poetry-section-inner{opacity:0;transition:opacity 1.2s ease}
+.poetry-section-inner.visible{opacity:1}
+.poetry-container{width:100%;height:100%;position:relative;overflow:hidden}
+.poetry-hint{position:absolute;top:6%;left:50%;transform:translateX(-50%);font-family:'Dancing Script',cursive;font-size:clamp(1rem,2.8vw,1.4rem);color:rgba(255,245,238,.5);letter-spacing:.08em;text-align:center;z-index:5}
+.poetry-petal{position:absolute;z-index:5;padding:clamp(12px,2.5vw,20px) clamp(16px,3.5vw,28px);background:linear-gradient(135deg,rgba(255,209,220,.18),rgba(232,213,245,.15));backdrop-filter:blur(6px);border:1px solid rgba(255,209,220,.2);border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(.8rem,2.2vw,1.1rem);color:rgba(255,245,238,.8);text-align:center;cursor:grab;touch-action:none;transition:box-shadow .4s;max-width:clamp(120px,32vw,200px);will-change:transform;box-shadow:0 4px 20px rgba(0,0,0,.15)}
+.poetry-petal.dragging{z-index:20;cursor:grabbing;box-shadow:0 12px 40px rgba(0,0,0,.25);transform:scale(1.08)}
+.poetry-petal.matched{animation:petalMerge .8s ease forwards}
+@keyframes petalMerge{0%{transform:scale(1.1);opacity:1}50%{transform:scale(1.3);opacity:.7}100%{transform:scale(0);opacity:0}}
+.poetry-complete{position:fixed;z-index:50;font-family:'Dancing Script',cursive;text-align:center;color:#d4af37;font-size:clamp(1.2rem,3.5vw,1.8rem);text-shadow:0 0 40px rgba(212,175,55,.3);animation:poemAppear 1.5s ease forwards;pointer-events:none}
+@keyframes poemAppear{0%{opacity:0;transform:scale(.5) translateY(20px)}40%{opacity:1;transform:scale(1.05) translateY(0)}100%{opacity:0;transform:scale(1.2) translateY(-30px)}}
+.star-burst{position:fixed;z-index:50;pointer-events:none;font-size:1.2rem;animation:starFly 1.2s ease forwards}
+@keyframes starFly{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(0)}}
+
+/* ── Screen 5: Constellation ── */
+.constellation-section-inner{opacity:0;transition:opacity 1.2s ease}
+.constellation-section-inner.visible{opacity:1}
+.constellation-container{width:100%;height:100%;position:relative;overflow:hidden}
+.constellation-hint{position:absolute;top:7%;left:50%;transform:translateX(-50%);font-family:'Dancing Script',cursive;font-size:clamp(.85rem,2.2vw,1.1rem);color:rgba(255,245,238,.18);letter-spacing:.1em;text-align:center;z-index:5;transition:opacity 1.5s ease;pointer-events:none}
+.constellation-hint.faded{opacity:0}
+.constellation-star{position:absolute;z-index:5;width:44px;height:44px;cursor:pointer;border-radius:50%;background:transparent;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;touch-action:manipulation}
+.constellation-star .dot{width:10px;height:10px;border-radius:50%;background:radial-gradient(circle at 40% 35%,rgba(255,255,255,.12),rgba(200,200,220,.04));transition:all .8s cubic-bezier(.4,0,.2,1);box-shadow:none}
+.constellation-star.key .dot{width:10px;height:10px}
+.constellation-star.lit .dot{background:radial-gradient(circle at 40% 30%,rgba(255,235,200,.95),rgba(255,200,150,.5));box-shadow:0 0 20px rgba(255,215,0,.3),0 0 50px rgba(255,200,150,.15);transform:scale(1.2)}
+.constellation-star.wrong{animation:starShake .4s ease 1}
+@keyframes starShake{0%,100%{transform:translate(-50%,-50%)}20%{transform:translate(-50%,-50%) translateX(-4px)}40%{transform:translate(-50%,-50%) translateX(4px)}60%{transform:translate(-50%,-50%) translateX(-3px)}80%{transform:translate(-50%,-50%) translateX(3px)}}
+#constellation-canvas{position:absolute;top:0;left:0;width:100%;height:100%;z-index:4;pointer-events:none}
+.constellation-complete-text{position:absolute;bottom:18%;left:50%;transform:translateX(-50%);font-family:'Dancing Script',cursive;font-size:clamp(1rem,3vw,1.6rem);color:#d4af37;text-align:center;z-index:6;opacity:0;text-shadow:0 0 40px rgba(212,175,55,.25),0 0 80px rgba(212,175,55,.1);pointer-events:none}
+.constellation-complete-text.show{opacity:1;animation:constellationReveal 1.8s ease forwards}
+@keyframes constellationReveal{0%{opacity:0;transform:translateX(-50%) translateY(15px) scale(.9)}100%{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}}
+.constellation-complete-text.fade-out{animation:constellationFade 1.5s ease forwards}
+@keyframes constellationFade{0%{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}100%{opacity:0;transform:translateX(-50%) translateY(-20px) scale(.8)}}
+.constellation-spark{position:fixed;z-index:50;pointer-events:none;font-size:clamp(.6rem,1.5vw,1rem);animation:sparkBurst .8s ease forwards}
+@keyframes sparkBurst{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--sx),var(--sy)) scale(0)}}
+/* ── Screen 6: Final ── */
+.final-section-inner{opacity:0;transition:opacity 1.2s ease}
+.final-section-inner.visible{opacity:1}
+.final-container{position:relative;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;perspective:1000px}
+
+/* Main star — heartbeat pulse */
+.final-star{position:relative;width:clamp(36px,9vw,60px);height:clamp(36px,9vw,60px);cursor:pointer;z-index:5;transition:all .6s cubic-bezier(.4,0,.2,1);filter:drop-shadow(0 0 15px rgba(212,175,55,.2));touch-action:manipulation}
+.final-star .star-icon{width:100%;height:100%;color:rgba(212,175,55,.65);filter:drop-shadow(0 0 12px rgba(212,175,55,.25))}
+.final-star.heartbeat{animation:heartPulse 4s ease-in-out infinite}
+@keyframes heartPulse{0%,100%{transform:scale(1);opacity:.7}25%{transform:scale(1.03);opacity:.85}50%{transform:scale(1);opacity:.7}75%{transform:scale(1.02);opacity:.8}}
+
+/* First click: tremble */
+.final-star.tremble{animation:trembleAnim .6s ease 1}
+@keyframes trembleAnim{0%{transform:translateX(0)}10%{transform:translateX(-2px) rotate(-2deg)}20%{transform:translateX(2px) rotate(2deg)}30%{transform:translateX(-1.5px) rotate(-1.5deg)}40%{transform:translateX(1.5px) rotate(1.5deg)}50%{transform:translateX(-1px) rotate(-1deg)}60%{transform:translateX(0) rotate(0)}100%{transform:translateX(0)}}
+
+/* Second click: slow unfold — 3s */
+.final-star.unfolding{animation:unfoldStar 3s cubic-bezier(.4,0,.2,1) forwards;pointer-events:none}
+@keyframes unfoldStar{0%{transform:scale(1) rotateY(0deg);opacity:1}30%{transform:scale(1.5) rotateY(60deg);opacity:.7}60%{transform:scale(2) rotateY(120deg);opacity:.4}85%{transform:scale(1.5) rotateY(170deg);opacity:.6}100%{transform:scale(0) rotateY(180deg);opacity:0}}
+
+/* Letter — frameless, text floats in space */
+.letter{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(.7);width:clamp(280px,75vw,500px);padding:0;opacity:0;transition:all 1.2s cubic-bezier(.4,0,.2,1);z-index:6;pointer-events:none;display:flex;flex-direction:column;align-items:center}
+.letter.open{opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:auto}
+
+/* Quote text */
+.letter-quote{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(1rem,2.8vw,1.35rem);color:rgba(255,245,238,.85);text-align:center;line-height:1.7;letter-spacing:.04em;margin-bottom:clamp(14px,2.5vh,24px);transition:opacity .5s ease,transform .5s ease}
+.letter-btn{display:inline-block;padding:6px 20px;font-family:'Cormorant Garamond',serif;font-size:clamp(.8rem,2vw,.95rem);color:rgba(212,175,55,.45);background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.12);border-radius:30px;cursor:pointer;transition:all .4s;letter-spacing:.06em;margin:0 auto;touch-action:manipulation}
+.letter-btn:active{background:rgba(212,175,55,.12);transform:scale(.95)}
+.letter-footer{display:flex;justify-content:center;margin-bottom:clamp(12px,2vh,20px)}
+
+/* Hollow star reply */
+.letter-reply{text-align:center;margin-top:clamp(4px,.8vh,10px);position:relative}
+.star-hollow{display:inline-block;width:clamp(28px,6vw,40px);height:clamp(28px,6vw,40px);cursor:pointer;position:relative;transition:all .6s cubic-bezier(.4,0,.2,1);touch-action:manipulation}
+.star-hollow svg{width:100%;height:100%}
+.star-hollow .hollow-outline{fill:none;stroke:rgba(212,175,55,.3);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;transition:all .6s}
+.star-hollow .hollow-fill{fill:rgba(212,175,55,0);transition:all .8s}
+.star-hollow.filled{transform:scale(1.15)}
+.star-hollow.filled .hollow-outline{stroke:rgba(212,175,55,.6);stroke-width:2}
+.star-hollow.filled .hollow-fill{fill:rgba(212,175,55,.35)}
+.star-hollow.filled + .reply-hint{opacity:0 !important}
+.star-hollow-glow{position:absolute;inset:-6px;border-radius:50%;background:radial-gradient(circle,rgba(212,175,55,.15),transparent 70%);opacity:0;transition:opacity .8s;pointer-events:none}
+.star-hollow.filled .star-hollow-glow{opacity:1;animation:hollowGlowPulse 2.5s ease-in-out infinite}
+@keyframes hollowGlowPulse{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.15);opacity:.9}}
+
+.reply-hint{font-size:clamp(.65rem,1.6vw,.8rem);color:rgba(255,245,238,.15);text-align:center;letter-spacing:.08em;margin-top:clamp(4px,.6vh,8px);transition:opacity .8s;pointer-events:none}
+.reply-confirm{font-size:clamp(.7rem,1.8vw,.85rem);color:rgba(212,175,55,.4);text-align:center;letter-spacing:.1em;margin-top:clamp(4px,.6vh,8px);opacity:0;transition:opacity 1.5s ease;pointer-events:none}
+.reply-confirm.show{opacity:1}
+
+/* Destined star text — appear at very end */
+.destined-line{font-family:'Dancing Script',cursive;font-size:clamp(.75rem,2vw,1rem);color:rgba(212,175,55,.2);text-align:center;letter-spacing:.12em;margin-top:clamp(12px,2vh,20px);opacity:0;transition:opacity 2s ease}
+.destined-line.show{opacity:1}
+
+/* ── Flower Collection ── */
+#flower-collection{position:fixed;bottom:clamp(12px,2.5vh,24px);right:clamp(12px,2.5vw,24px);z-index:40;display:flex;align-items:center;gap:2px}
+.wreath-icon{width:clamp(32px,7vw,50px);height:clamp(32px,7vw,50px);border-radius:50%;border:1.5px solid rgba(255,209,220,.12);display:flex;align-items:center;justify-content:center;font-size:clamp(1rem,2.5vw,1.5rem);background:rgba(255,209,220,.03);transition:all .8s;backdrop-filter:blur(4px);position:relative;flex-shrink:0}
+.wreath-icon.internal{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:1px;padding:3px;font-size:clamp(.5rem,1.2vw,.75rem);overflow:hidden}
+.wreath-icon .wr-f{font-size:clamp(.5rem,1.2vw,.7rem);opacity:0;transition:all .6s cubic-bezier(.34,1.56,.64,1);transform:scale(0);display:flex;align-items:center;justify-content:center}
+.wreath-icon .wr-f.found{opacity:1;transform:scale(1)}
+.wreath-icon.complete{border-color:rgba(212,175,55,.5);background:rgba(212,175,55,.1);animation:wreathBloom 1.5s ease forwards;box-shadow:0 0 30px rgba(212,175,55,.15)}
+
+/* Wreath completion */
+@keyframes wreathBloom{0%{transform:scale(1)}30%{transform:scale(1.18)}60%{transform:scale(.95)}100%{transform:scale(1);border-color:#d4af37;box-shadow:0 0 35px rgba(212,175,55,.25)}}
+.wreath-complete-msg{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:50;font-family:'Dancing Script',cursive;font-size:clamp(1.4rem,4vw,2.2rem);color:#d4af37;text-align:center;text-shadow:0 0 40px rgba(212,175,55,.3);animation:wreathMsgFade 3.5s ease forwards;pointer-events:none}
+@keyframes wreathMsgFade{0%{opacity:0;transform:translate(-50%,-50%) scale(.7)}20%{opacity:1;transform:translate(-50%,-50%) scale(1)}80%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(.6) translateY(-10px)}}
+
+/* ── On-screen discoverable flower ── */
+.flwr{position:fixed;z-index:45;width:clamp(30px,7vw,44px);height:clamp(30px,7vw,44px);display:flex;align-items:center;justify-content:center;pointer-events:auto;cursor:pointer;opacity:0;transition:opacity .8s ease,transform .8s cubic-bezier(.34,1.56,.64,1);transform:scale(0);touch-action:manipulation}
+.flwr.show{opacity:1;transform:scale(1)}
+.flwr .flwr-inner{width:100%;height:100%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:clamp(1rem,2.8vw,1.5rem);position:relative}
+.flwr .flwr-glow{position:absolute;inset:-4px;border-radius:50%;opacity:0;animation:flwrGlowPulse 2s ease-in-out infinite}
+@keyframes flwrGlowPulse{0%,100%{opacity:.2;transform:scale(1)}50%{opacity:.6;transform:scale(1.12)}}
+.flwr.show .flwr-glow{opacity:1}
+.flwr-sway{animation:flwrSway 3s ease-in-out infinite}
+@keyframes flwrSway{0%,100%{transform:scale(1) rotate(-2deg)}50%{transform:scale(1.05) rotate(2deg)}}
+
+/* Sparkle trail when flower flies */
+.flwr-spark{position:fixed;z-index:46;pointer-events:none;border-radius:50%;animation:sparkTrail .7s ease-out forwards}
+@keyframes sparkTrail{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(0) translate(var(--sx),var(--sy))}}
+
+/* ── Dots indicator ── */
+#dots-indicator{position:fixed;bottom:clamp(16px,4vh,32px);left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:30;pointer-events:none}
+.dot{width:6px;height:6px;border-radius:50%;background:rgba(255,245,238,.18);transition:all .5s cubic-bezier(.4,0,.2,1)}
+.dot.active{background:rgba(212,175,55,.55);width:20px;border-radius:4px}
+
+/* ── Music Player ── */
+#music-btn{position:fixed;bottom:clamp(12px,2.5vh,24px);left:clamp(12px,2.5vw,24px);z-index:40;width:clamp(32px,7vw,44px);height:clamp(32px,7vw,44px);border-radius:50%;border:1px solid rgba(255,209,220,.1);background:transparent;color:rgba(255,245,238,.25);font-size:clamp(1rem,2.4vw,1.4rem);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .6s ease;backdrop-filter:blur(4px);-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+#music-btn:hover{color:rgba(255,245,238,.4);border-color:rgba(255,209,220,.2)}
+#music-btn.active{color:rgba(212,175,55,.5);border-color:rgba(212,175,55,.2);box-shadow:0 0 12px rgba(212,175,55,.08)}
+#music-btn.playing{animation:musicPulse 3s ease-in-out infinite}
+@keyframes musicPulse{0%,100%{box-shadow:0 0 8px rgba(212,175,55,.05)}50%{box-shadow:0 0 18px rgba(212,175,55,.12)}}
+#bgm{display:none}
+@media(max-width:480px){
+  .section{padding:3vw 4vw}
+  .letter{width:88vw;padding:0}
+  .cake-svg-wrap{width:52vw}
+  .constellation-star{width:40px;height:40px}
+  .flwr{width:44px;height:44px}
+  .letter-btn{padding:12px 28px;font-size:clamp(.9rem,2.4vw,1rem)}
+  .poetry-petal{max-width:38vw;padding:10px 14px;font-size:clamp(.7rem,2vw,.9rem)}
+}
+@media(max-width:374px){
+  .constellation-star{width:36px;height:36px}
+  .constellation-star .dot{width:8px;height:8px}
+  .constellation-star.key .dot{width:8px;height:8px}
+  .birthday-title{font-size:clamp(1.6rem,7vw,2.2rem)}
+  .greeting-text{font-size:clamp(1.2rem,4.5vw,1.6rem)}
+  .poetry-petal{max-width:42vw;padding:8px 10px;font-size:clamp(.65rem,1.8vw,.8rem)}
+  .cake-svg-wrap{width:48vw}
+}
+@media(min-width:768px){
+  .poetry-petal{max-width:240px;padding:18px 30px}
+}
+</style>
+</head>
+<body>
+
+<!-- Background layers -->
+<div id="bg-layer"></div>
+<div id="aurora-layer">
+  <div class="aurora-band"></div>
+  <div class="aurora-band"></div>
+  <div class="aurora-band"></div>
+  <div class="aurora-band"></div>
+</div>
+<canvas id="star-canvas"></canvas>
+<canvas id="petal-canvas"></canvas>
+
+<!-- Scroll container -->
+<div id="scroll-container">
+
+  <!-- Screen 1 -->
+  <section class="section" data-index="0">
+    <div class="section-inner">
+      <div class="greeting-text" id="greeting-text">To the one who makes the world soft.</div>
+      <div class="greeting-hint">— 向下滑动 —</div>
+    </div>
+  </section>
+
+  <!-- Screen 2 -->
+  <section class="section" data-index="1" id="screen-birthday">
+    <div class="section-inner">
+      <div class="birthday-wrapper" id="birthday-wrapper">
+        <div class="birthday-title" id="birthday-title"></div>
+        <div class="birthday-sub" id="birthday-sub">— to the gentlest soul —</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Screen 3 -->
+  <section class="section" data-index="2">
+    <div class="section-inner cake-section-inner" id="cake-section-inner">
+      <div class="cake-container">
+        <div class="cake-svg-wrap" id="cake">
+          <div class="cake-glow" id="cake-glow"></div>
+          <svg viewBox="0 0 260 290" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="tier1g" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="rgba(255,250,245,.7)"/>
+                <stop offset="40%" stop-color="rgba(250,242,235,.55)"/>
+                <stop offset="100%" stop-color="rgba(245,238,228,.45)"/>
+              </linearGradient>
+              <linearGradient id="tier2g" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="rgba(255,250,245,.65)"/>
+                <stop offset="50%" stop-color="rgba(248,240,232,.5)"/>
+                <stop offset="100%" stop-color="rgba(240,232,222,.4)"/>
+              </linearGradient>
+              <linearGradient id="frostg" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="rgba(255,250,248,.75)"/>
+                <stop offset="100%" stop-color="rgba(255,245,240,.5)"/>
+              </linearGradient>
+              <linearGradient id="candleG" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#ffc0cb"/>
+                <stop offset="100%" stop-color="#ff8da1"/>
+              </linearGradient>
+              <radialGradient id="flameG" cx="50%" cy="65%" r="55%">
+                <stop offset="0%" stop-color="rgba(255,210,160,.95)"/>
+                <stop offset="30%" stop-color="rgba(255,170,140,.7)"/>
+                <stop offset="55%" stop-color="rgba(255,130,110,.4)"/>
+                <stop offset="80%" stop-color="rgba(255,180,160,.15)"/>
+                <stop offset="100%" stop-color="transparent"/>
+              </radialGradient>
+              <filter id="cakeShadow"><feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="rgba(0,0,0,.1)"/></filter>
+              <filter id="cakeGlowF"><feGaussianBlur stdDeviation="3"/></filter>
+            </defs>
+
+            <!-- Bottom tier (wider) -->
+            <rect class="cake-shape" x="30" y="175" width="200" height="95" rx="18" ry="18" fill="url(#tier1g)" stroke="rgba(255,248,240,.15)" stroke-width=".5" filter="url(#cakeShadow)"/>
+            <rect class="cake-shape" x="30" y="175" width="200" height="18" rx="9" fill="url(#frostg)" opacity=".6"/>
+
+            <!-- Frosting drip decoration bottom tier -->
+            <path d="M30 193 Q40 210 55 193 Q70 215 85 193 Q100 212 115 193 Q130 216 145 193 Q160 211 175 193 Q190 215 205 193 Q215 208 230 193" fill="url(#frostg)" opacity=".4"/>
+
+            <!-- Top tier -->
+            <rect class="cake-shape" x="62" y="100" width="136" height="88" rx="16" ry="16" fill="url(#tier2g)" stroke="rgba(255,248,240,.12)" stroke-width=".5" filter="url(#cakeShadow)"/>
+            <rect class="cake-shape" x="62" y="100" width="136" height="14" rx="7" fill="url(#frostg)" opacity=".55"/>
+
+            <!-- Frosting drip top tier -->
+            <path d="M62 114 Q72 128 85 114 Q98 133 110 114 Q122 130 135 114 Q148 134 160 114 Q172 127 182 114 Q190 124 198 114" fill="url(#frostg)" opacity=".35"/>
+
+            <!-- Highlight gloss -->
+            <ellipse cx="100" cy="130" rx="28" ry="18" fill="rgba(255,255,255,.18)" transform="rotate(-12 100 130)"/>
+            <ellipse cx="80" cy="210" rx="35" ry="20" fill="rgba(255,255,255,.13)" transform="rotate(-10 80 210)"/>
+
+            <!-- Small decorative dots (frosting beads) -->
+            <circle cx="48" cy="180" r="3" fill="rgba(255,250,245,.3)"/>
+            <circle cx="70" cy="178" r="2.5" fill="rgba(255,250,245,.25)"/>
+            <circle cx="150" cy="182" r="3" fill="rgba(255,250,245,.3)"/>
+            <circle cx="180" cy="176" r="2.5" fill="rgba(255,250,245,.25)"/>
+            <circle cx="210" cy="180" r="2" fill="rgba(255,250,245,.2)"/>
+
+            <circle cx="80" cy="105" r="2.5" fill="rgba(255,250,245,.3)"/>
+            <circle cx="130" cy="108" r="2" fill="rgba(255,250,245,.25)"/>
+            <circle cx="175" cy="103" r="2.5" fill="rgba(255,250,245,.3)"/>
+
+            <!-- Candle -->
+            <g class="candle-group">
+              <rect class="candle-shape" x="124" y="52" width="12" height="48" rx="3" fill="url(#candleG)" stroke="rgba(255,182,193,.2)" stroke-width=".3"/>
+              <line x1="130" y1="48" x2="130" y2="52" stroke="#8b7355" stroke-width="1.5" stroke-linecap="round"/>
+              <!-- Flame -->
+              <ellipse class="flame-svg" cx="130" cy="34" rx="10" ry="16" fill="url(#flameG)"/>
+              <!-- Flame inner glow -->
+              <ellipse class="flame-svg" cx="128" cy="32" rx="4" ry="8" fill="rgba(255,220,180,.5)" opacity=".6"/>
+            </g>
+          </svg>
+          <div class="cake-sparkle"></div>
+          <div class="cake-sparkle"></div>
+          <div class="cake-sparkle"></div>
+          <div class="cake-sparkle"></div>
+          <div class="cake-sparkle"></div>
+          <div class="cake-sparkle"></div>
+          <div class="cake-sparkle"></div>
+        </div>
+        <div class="cake-label" id="cake-label">轻点蜡烛</div>
+        <div class="wish-text" id="wish-text">许个愿吧，它会被夜风送走。</div>
+        <div class="emoji-bar" id="emoji-bar">
+          <span class="emoji-btn" data-emoji="cake">🎂</span>
+          <span class="emoji-btn" data-emoji="sparkle">✨</span>
+          <span class="emoji-btn" data-emoji="heart">💖</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Screen 4 -->
+  <section class="section" data-index="3">
+    <div class="section-inner poetry-section-inner" id="poetry-section-inner">
+      <div class="poetry-container" id="poetry-container">
+        <div class="poetry-hint">— 将花瓣拖到一起，拼成完整的诗 —</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Screen 5 -->
+  <section class="section" data-index="4">
+    <div class="section-inner constellation-section-inner" id="constellation-section-inner">
+      <div class="constellation-container" id="constellation-container">
+        <div class="constellation-hint">试着点亮它们</div>
+        <canvas id="constellation-canvas"></canvas>
+        <div class="constellation-complete-text" id="constellation-complete-text">今夜，这个星座只为你命名。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Screen 6 -->
+  <section class="section" data-index="5">
+    <div class="section-inner final-section-inner" id="final-section-inner">
+      <div class="final-container">
+        <div class="final-star heartbeat" id="final-star">
+          <svg class="star-icon" viewBox="0 0 100 100" fill="currentColor">
+            <path d="M50 5 L61 38 L96 38 L68 59 L79 93 L50 72 L21 93 L32 59 L4 38 L39 38 Z"/>
+          </svg>
+        </div>
+        <div class="letter" id="letter">
+          <div class="letter-quote" id="letter-quote"></div>
+          <div class="letter-footer"><span class="letter-btn" id="letter-btn">新的一句</span></div>
+          <div class="letter-reply">
+            <div class="star-hollow" id="star-hollow">
+              <div class="star-hollow-glow"></div>
+              <svg viewBox="0 0 100 100">
+                <path class="hollow-outline" d="M50 5 L61 38 L96 38 L68 59 L79 93 L50 72 L21 93 L32 59 L4 38 L39 38 Z"/>
+                <path class="hollow-fill" d="M50 5 L61 38 L96 38 L68 59 L79 93 L50 72 L21 93 L32 59 L4 38 L39 38 Z"/>
+              </svg>
+            </div>
+            <div class="reply-hint">轻点，寄出回信</div>
+            <div class="reply-confirm" id="reply-confirm">你的回信已寄往星尘邮局。</div>
+          </div>
+          <div class="destined-line" id="destined-line">今夜，宇宙记得你。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- Dots indicator (fixed) -->
+<div id="dots-indicator">
+  <span class="dot active"></span>
+  <span class="dot"></span>
+  <span class="dot"></span>
+  <span class="dot"></span>
+  <span class="dot"></span>
+  <span class="dot"></span>
+</div>
+
+<!-- Flower collection (fixed) -->
+<div id="flower-collection">
+  <div class="wreath-icon internal" id="wreath-icon">
+    <span class="wr-f" data-flw="0"></span>
+    <span class="wr-f" data-flw="1"></span>
+    <span class="wr-f" data-flw="2"></span>
+    <span class="wr-f" data-flw="3"></span>
+    <span class="wr-f" data-flw="4"></span>
+  </div>
+</div>
+
+<!-- Music control -->
+<button id="music-btn">♪</button>
+<audio id="bgm" src="bgm.mp3" loop preload="auto"></audio>
+
+<script>
+(function(){
+'use strict';
+
+/* ── Config ── */
+const QUOTES = [
+  '生日快乐，不必完美，你在就已经是礼物。',
+  '你只要继续做那个温柔而明亮的人，就已经是在回赠整个世界。',
+  '祝你今天快乐，也祝你在不被看见的日子里，依然温柔生长。',
+  '愿你的新一岁，被月光和玫瑰同时选中。',
+  '你是有人偷偷许下的愿。',
+  '这个世界或许很吵，但你永远是安静的那一颗星。',
+  '今天不祝你变成更好的人，只祝你做自己就好。',
+  '愿你继续明亮，继续柔软，继续被爱。',
+  '生日不是纪念日，是提醒——你值得被庆祝。',
+  '你许愿的时候，星星都在认真听。',
+  '愿你的每一天，都像今天一样被温柔接住。',
+  '你看，连宇宙都在这一天为你多亮了一颗星。',
+  '岁岁年年，你还是你，就已经很好。',
+  '祝你拥有很多很多的爱和很多很多的月亮。',
+  '所有最好的祝福，都已经写在你今天的眼睛里。',
+  '不必急着长大，温柔的人永远值得被等待。',
+  '愿你的路上，有光，有风，有为你开的花。',
+  '你本身就是一份很好的生日礼物。',
+  '生日快乐，愿月亮常伴你左右。',
+  '今天所有的星星都偏向你。',
+  '愿你的世界，永远有光，有爱，有星辰。',
+  '你值得这个世界上最温柔的祝福。'
+];
+const POEMS = [
+  {a:'你像月亮，所以', b:'连黑暗都忍不住温柔', id:0},
+  {a:'风会记得', b:'每一朵花的愿望', id:1},
+  {a:'星光落在你肩头', b:'就成了明天出发的勇气', id:2}
+];
+const FLOWERS = [
+  {id:'moonwhite', name:'月光白', emoji:'🌼', color:'rgba(255,250,245,.9)', label:'月光白 · 雏菊', x:.12, y:.15},
+  {id:'champagne', name:'香槟粉', emoji:'🌸', color:'rgba(255,210,220,.9)', label:'香槟粉 · 玫瑰', x:.78, y:.18},
+  {id:'lavender', name:'淡紫色', emoji:'🪷', color:'rgba(220,200,245,.85)', label:'淡紫色 · 铃兰', x:.22, y:.65},
+  {id:'stardust', name:'星尘金', emoji:'✧', color:'rgba(212,175,55,.9)', label:'星尘金 · 星辰花', x:.85, y:.72},
+  {id:'mistblue', name:'晨雾蓝', emoji:'❀', color:'rgba(190,215,235,.85)', label:'晨雾蓝 · 月光花', x:.50, y:.88}
+];
+
+/* ── State ── */
+const state = {
+  birthdayTriggered: false,
+  isDraggingPoetry: false,
+  candleClicked: false,
+  emojiClicked: {},
+  poetryMatched: new Set(),
+  constellationComplete: false,
+  letterOpen: false,
+  flowersFound: new Set(),
+  greetingStayCounted: false,
+  swipeUpCount: 0,
+  lastSwipeTime: 0,
+  audioCtx: null,
+  scrollTop: 0,
+  lastScrollTime: 0,
+  screenTriggers: {},
+  finalScreenInited: false,
+  currentQuoteIndex: 0
+};
+
+/* ── DOM refs ── */
+const $ = id => document.getElementById(id);
+const scrollContainer = $('scroll-container');
+const starCanvas = $('star-canvas');
+const petalCanvas = $('petal-canvas');
+const ctx = starCanvas.getContext('2d');
+const pctx = petalCanvas.getContext('2d');
+const birthdayTitle = $('birthday-title');
+const birthdayWrapper = $('birthday-wrapper');
+const birthdaySub = $('birthday-sub');
+const cake = $('cake');
+const cakeGlow = $('cake-glow');
+const cakeLabel = $('cake-label');
+const wishText = $('wish-text');
+const emojiBar = $('emoji-bar');
+const cakeSectionInner = $('cake-section-inner');
+const poetryContainer = $('poetry-container');
+const poetrySectionInner = $('poetry-section-inner');
+const constellationCanvas = $('constellation-canvas');
+const constCtx = constellationCanvas.getContext('2d');
+const constellationCompleteText = $('constellation-complete-text');
+const constellationSectionInner = $('constellation-section-inner');
+const finalSectionInner = $('final-section-inner');
+const finalStar = $('final-star');
+const letter = $('letter');
+const letterQuote = $('letter-quote');
+const letterBtn = $('letter-btn');
+const wreathIcon = $('wreath-icon');
+const dots = document.querySelectorAll('#dots-indicator .dot');
+const sections = document.querySelectorAll('.section');
+
+/* ── Stars system ── */
+let stars = [];
+const STAR_COUNT = 180;
+
+function initStars(){
+  stars = [];
+  for(let i=0;i<STAR_COUNT;i++){
+    stars.push({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      r: Math.random() * 2 + .3,
+      baseAlpha: Math.random() * .6 + .2,
+      alpha: 0,
+      twinkleSpeed: Math.random() * .02 + .005,
+      twinklePhase: Math.random() * Math.PI * 2,
+      twinkleAmount: Math.random() * .4 + .1,
+      hue: Math.random() > .7 ? (Math.random() * 60 + 220) : 0
+    });
+  }
+}
+
+function drawStars(time, scrollVel){
+  ctx.clearRect(0,0,starCanvas.width,starCanvas.height);
+  const viewH = window.innerHeight;
+  const st = state.scrollTop;
+  const vel = Math.min(scrollVel * 60, .45);
+
+  for(const s of stars){
+    s.alpha = s.baseAlpha + Math.sin(time * s.twinkleSpeed + s.twinklePhase) * s.twinkleAmount;
+
+    // Scroll-velocity shimmer near viewport center
+    if(vel > .02){
+      const svy = s.y - st;
+      const dCenter = Math.abs(svy - viewH/2) / (viewH/2);
+      if(dCenter < 1){
+        s.alpha += vel * (1 - dCenter) * .35;
+      }
+    }
+
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+    if(s.hue > 0) ctx.fillStyle = `hsla(${s.hue},60%,80%,${Math.min(1,s.alpha)})`;
+    else ctx.fillStyle = `rgba(255,245,238,${Math.min(1,s.alpha)})`;
+    ctx.fill();
+
+    if(s.alpha > .5 && s.r > 1.2){
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r * 2.5, 0, Math.PI*2);
+      ctx.fillStyle = s.hue > 0
+        ? `hsla(${s.hue},50%,80%,${s.alpha * .08})`
+        : `rgba(255,245,238,${s.alpha * .06})`;
+      ctx.fill();
+    }
+  }
+}
+
+/* ── Petal canvas system ── */
+let petals = [];
+const MAX_PETALS = window.innerWidth < 768 ? 15 : 25;
+const PETAL_COLORS = [
+  'rgba(255,200,210,.65)',
+  'rgba(220,200,240,.55)',
+  'rgba(255,235,225,.45)',
+  'rgba(255,215,220,.50)',
+  'rgba(200,220,245,.40)'
+];
+
+function spawnPetal(){
+  if(petals.length >= MAX_PETALS) return;
+  const pw = petalCanvas.width, ph = petalCanvas.height;
+  if(pw < 1 || ph < 1) return;
+  petals.push({
+    x: Math.random() * pw,
+    y: -30 - Math.random() * 40,
+    size: 4 + Math.random() * 9,
+    vx: (Math.random() - .5) * .35,
+    vy: .15 + Math.random() * .35,
+    rot: Math.random() * Math.PI * 2,
+    rotV: (Math.random() - .5) * .025,
+    life: 0,
+    maxLife: 700 + Math.random() * 500,
+    color: PETAL_COLORS[Math.floor(Math.random() * PETAL_COLORS.length)],
+    swayPhase: Math.random() * Math.PI * 2
+  });
+}
+
+function updatePetals(){
+  for(let i=petals.length-1;i>=0;i--){
+    const p = petals[i];
+    p.life++;
+    p.vy += .002;
+    p.x += p.vx + Math.sin(p.life * .012 + p.swayPhase) * .25;
+    p.y += p.vy;
+    p.rot += p.rotV;
+    if(p.x < -60) p.x = petalCanvas.width + 20;
+    else if(p.x > petalCanvas.width + 60) p.x = -20;
+    if(p.y > petalCanvas.height + 30 || p.life > p.maxLife){
+      petals.splice(i,1);
+    }
+  }
+}
+
+function drawPetals(){
+  pctx.clearRect(0,0,petalCanvas.width,petalCanvas.height);
+  for(const p of petals){
+    const fadeIn = Math.min(p.life / 50, 1);
+    const fadeOut = p.life > p.maxLife - 50 ? (p.maxLife - p.life) / 50 : 1;
+    const a = fadeIn * fadeOut;
+
+    pctx.save();
+    pctx.translate(p.x, p.y);
+    pctx.rotate(p.rot);
+    pctx.globalAlpha = a;
+
+    const grad = pctx.createRadialGradient(0,-p.size*.15,0,0,0,p.size*1.4);
+    grad.addColorStop(0,'rgba(255,255,255,.25)');
+    grad.addColorStop(1,p.color);
+    pctx.beginPath();
+    pctx.ellipse(0,0,p.size,p.size*.38,0,0,Math.PI*2);
+    pctx.fillStyle = grad;
+    pctx.fill();
+
+    pctx.restore();
+  }
+}
+
+function startPetalSpawner(){
+  for(let i=0;i<4;i++) setTimeout(spawnPetal, i*600);
+  setInterval(()=>{
+    if(petals.length < MAX_PETALS - 2) spawnPetal();
+  }, 1800);
+}
+
+/* ── Intersection Observer ── */
+const observer = new IntersectionObserver((entries)=>{
+  let maxIdx = -1, maxRatio = 0;
+  entries.forEach(entry=>{
+    const idx = parseInt(entry.target.dataset.index);
+    if(entry.intersectionRatio > maxRatio){
+      maxRatio = entry.intersectionRatio;
+      maxIdx = idx;
+    }
+    if(entry.isIntersecting && entry.intersectionRatio >= .3){
+      triggerScreenOnce(idx);
+    }
+  });
+  if(maxIdx >= 0) updateDots(maxIdx);
+}, {threshold:[0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1]});
+
+sections.forEach(s=>observer.observe(s));
+
+function triggerScreenOnce(idx){
+  if(state.screenTriggers[idx]) return;
+  state.screenTriggers[idx] = true;
+  switch(idx){
+    case 1: triggerBirthday(); break;
+    case 2: { cakeSectionInner.classList.add('visible'); cakeLabel.classList.add('show'); } break;
+    case 3: { poetrySectionInner.classList.add('visible'); initPoetry(); } break;
+    case 4: { constellationSectionInner.classList.add('visible'); initConstellation(); } break;
+    case 5: { finalSectionInner.classList.add('visible'); initFinalScreen(); } break;
+  }
+}
+
+function updateDots(active){
+  dots.forEach((d,i)=>d.classList.toggle('active',i===active));
+}
+
+/* ── Screen 2: Birthday ── */
+function triggerBirthday(){
+  if(state.birthdayTriggered) return;
+  state.birthdayTriggered = true;
+  birthdayWrapper.classList.add('visible');
+  const text = 'Happy Birthday';
+  birthdayTitle.innerHTML = '';
+  for(let i=0;i<text.length;i++){
+    const span = document.createElement('span');
+    span.className = 'char';
+    span.textContent = text[i]===' '?' ':text[i];
+    span.style.animationDelay = (i*.1+.3)+'s';
+    birthdayTitle.appendChild(span);
+  }
+  setTimeout(()=>birthdaySub.classList.add('visible'), 2000);
+  playBirthdayChord();
+}
+
+function playBirthdayChord(){
+  try{
+    const AC = window.AudioContext||window.webkitAudioContext;
+    if(!state.audioCtx) state.audioCtx = new AC();
+    const ac = state.audioCtx;
+    if(ac.state==='suspended') ac.resume();
+    [261.63,329.63,392.00,493.88].forEach((f,i)=>{
+      const o=ac.createOscillator(),g=ac.createGain();
+      o.type='sine';o.frequency.value=f;
+      g.gain.setValueAtTime(0,ac.currentTime);
+      g.gain.linearRampToValueAtTime(.035,ac.currentTime+.2);
+      g.gain.linearRampToValueAtTime(.025,ac.currentTime+1);
+      g.gain.linearRampToValueAtTime(0,ac.currentTime+2.5+i*.3);
+      o.connect(g);g.connect(ac.destination);
+      o.start(ac.currentTime+.1+i*.15);
+      o.stop(ac.currentTime+2.5+i*.3);
+    });
+  }catch(e){}
+}
+
+/* ── Screen 3: Cake ── */
+cake.addEventListener('click',function(e){
+  if(state.candleClicked) return;
+  state.candleClicked=true;
+
+  // 1. Flame flickers gently once
+  const flame = cake.querySelector('.flame-svg');
+  if(flame) flame.classList.add('flicker-once');
+
+  // 2. Golden stars fall from top
+  spawnFallingStars();
+
+  // 3. Show golden glow around cake
+  cakeGlow.classList.add('active');
+
+  // 4. After short pause, show wish text
+  setTimeout(()=>{
+    wishText.classList.add('show');
+    // Flower 2: champagne near flame
+    if(!state.flowersFound.has('champagne')){
+      setTimeout(()=>{
+        const cakeRect = cake.getBoundingClientRect();
+        spawnFlowerVisual('champagne', cakeRect.left + cakeRect.width * .62, cakeRect.top - 10);
+      }, 300);
+    }
+  }, 600);
+
+  // 5. After wish text stays 3s, fade in emoji buttons
+  setTimeout(()=>{
+    emojiBar.classList.add('show');
+  }, 3600);
+});
+
+// Emoji buttons
+document.querySelectorAll('.emoji-btn').forEach(btn=>{
+  btn.addEventListener('click',function(e){
+    const t=this.dataset.emoji;
+    if(state.emojiClicked[t])return;
+    state.emojiClicked[t]=true;
+
+    // Cake bounces
+    cake.classList.remove('bounce');
+    void cake.offsetWidth;
+    cake.classList.add('bounce');
+
+    // Blessing text
+    const msgs={
+      cake:'蛋糕与你',
+      sparkle:'今天月亮在为你加冕',
+      heart:'有人正悄悄记住你的温柔'
+    };
+    spawnBlessingText(msgs[t], e);
+
+    this.style.opacity='.5';this.style.transform='scale(.88)';
+  });
+});
+
+function spawnFallingStars(){
+  const cx=window.innerWidth/2;
+  const ch=['✦','✧','⋆','☆'];
+  const count=8+Math.floor(Math.random()*4);
+  for(let i=0;i<count;i++){
+    setTimeout(()=>{
+      const s=document.createElement('div');
+      s.className='golden-star';
+      s.textContent=ch[Math.floor(Math.random()*ch.length)];
+      s.style.left=(cx+(Math.random()-.5)*window.innerWidth*.6)+'px';
+      s.style.top='-20px';
+      s.style.setProperty('--fall-dur',(2.5+Math.random()*2)+'s');
+      s.style.fontSize=(.6+Math.random()*.8)+'rem';
+      document.body.appendChild(s);
+      setTimeout(()=>s.remove(),5000);
+    },i*(200+Math.random()*200));
+  }
+}
+
+function spawnBlessingText(msg,e){
+  const rect=e.currentTarget.getBoundingClientRect();
+  const el=document.createElement('div');
+  el.className='blessing-text';
+  el.textContent=msg;
+  el.style.left=(rect.left+rect.width/2-80)+'px';
+  el.style.bottom=(window.innerHeight-rect.top+20)+'px';
+  el.style.width='160px';
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),2500);
+}
+
+function spawnStarBurst(cx,cy){
+  const ch=['✦','✧','⋆','☆'];
+  for(let i=0;i<12;i++){
+    setTimeout(()=>{
+      const e=document.createElement('div');
+      e.className='star-burst';
+      e.textContent=ch[Math.floor(Math.random()*4)];
+      e.style.left=cx+'px';e.style.top=cy+'px';
+      e.style.color='#d4af37';
+      const a=(i/12)*Math.PI*2, d=60+Math.random()*80;
+      e.style.setProperty('--tx',Math.cos(a)*d+'px');
+      e.style.setProperty('--ty',Math.sin(a)*d+'px');
+      document.body.appendChild(e);
+      setTimeout(()=>e.remove(),1200);
+    },i*30);
+  }
+}
+
+/* ── Screen 4: Poetry ── */
+let poetryPetals=[], dragState=null, poetryInited=false;
+
+function initPoetry(){
+  if(poetryInited) return;
+  poetryInited=true;
+  const pairs=[...POEMS];
+  const petals=pairs.flatMap(p=>[
+    {text:p.a,pairId:p.id,side:'a'},
+    {text:p.b,pairId:p.id,side:'b'}
+  ]);
+  for(let i=petals.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [petals[i],petals[j]]=[petals[j],petals[i]];
+  }
+  const w=poetryContainer.clientWidth||window.innerWidth;
+  const h=poetryContainer.clientHeight||window.innerHeight;
+  const cx=w/2,cy=h/2,radius=Math.min(w,h)*.25;
+
+  petals.forEach((p,i)=>{
+    const el=document.createElement('div');
+    el.className='poetry-petal';
+    el.textContent=p.text;
+    el.dataset.pairId=p.pairId;
+    el.dataset.side=p.side;
+    const angle=i/petals.length*Math.PI*2-Math.PI/2;
+    el.style.left=(cx+Math.cos(angle)*radius-80)+'px';
+    el.style.top=(cy+Math.sin(angle)*radius-30)+'px';
+    poetryContainer.appendChild(el);
+    poetryPetals.push({el,...p,x:cx+Math.cos(angle)*radius-80,y:cy+Math.sin(angle)*radius-30});
+    el.addEventListener('pointerdown',e=>startPoetryDrag(e,el));
+  });
+}
+
+function startPoetryDrag(e,el){
+  if(el.classList.contains('matched'))return;
+  e.preventDefault();
+  state.isDraggingPoetry=true;
+  const rect=el.getBoundingClientRect();
+  dragState={el,offsetX:e.clientX-rect.left,offsetY:e.clientY-rect.top};
+  el.classList.add('dragging');el.style.zIndex=20;
+  document.addEventListener('pointermove',onPoetryDrag);
+  document.addEventListener('pointerup',endPoetryDrag);
+}
+
+function onPoetryDrag(e){
+  if(!dragState)return;
+  const el=dragState.el,parent=poetryContainer.getBoundingClientRect();
+  let x=e.clientX-parent.left-dragState.offsetX;
+  let y=e.clientY-parent.top-dragState.offsetY;
+  x=Math.max(0,Math.min(x,parent.width-100));
+  y=Math.max(0,Math.min(y,parent.height-60));
+  el.style.left=x+'px';el.style.top=y+'px';
+  const petal=poetryPetals.find(p=>p.el===el);
+  if(petal){petal.x=x;petal.y=y;}
+}
+
+function endPoetryDrag(){
+  if(!dragState)return;
+  state.isDraggingPoetry=false;
+  const el=dragState.el;
+  el.classList.remove('dragging');
+  document.removeEventListener('pointermove',onPoetryDrag);
+  document.removeEventListener('pointerup',endPoetryDrag);
+  const petal=poetryPetals.find(p=>p.el===el);
+  if(petal&&!petal.matched){
+    const match=poetryPetals.find(p=>p.pairId===petal.pairId&&p.side!==petal.side&&!p.matched);
+    if(match){
+      const dx=petal.x-match.x,dy=petal.y-match.y;
+      if(Math.sqrt(dx*dx+dy*dy)<120){
+        petal.matched=true;match.matched=true;
+        petal.el.classList.add('matched');match.el.classList.add('matched');
+        state.poetryMatched.add(petal.pairId);
+        showPoemComplete(petal,match);
+        setTimeout(()=>{petal.el.style.display='none';match.el.style.display='none';},800);
+      }
+    }
+  }
+  dragState=null;
+}
+
+function showPoemComplete(petal,match){
+  const fullPoem=POEMS.find(p=>p.id===petal.pairId);
+  if(!fullPoem)return;
+  const cx=window.innerWidth/2,cy=window.innerHeight/2;
+  for(let i=0;i<20;i++){
+    setTimeout(()=>{
+      const s=document.createElement('div');
+      s.className='star-burst';
+      s.textContent=['✦','✧','⋆','☆'][Math.floor(Math.random()*4)];
+      s.style.left=cx+'px';s.style.top=cy+'px';s.style.color='#d4af37';
+      const angle=Math.random()*Math.PI*2,dist=80+Math.random()*150;
+      s.style.setProperty('--tx',Math.cos(angle)*dist+'px');
+      s.style.setProperty('--ty',Math.sin(angle)*dist+'px');
+      document.body.appendChild(s);
+      setTimeout(()=>s.remove(),1200);
+    },i*40);
+  }
+  setTimeout(()=>{
+    const pe=document.createElement('div');
+    pe.className='poetry-complete';
+    pe.textContent=`「${fullPoem.a} ${fullPoem.b}」`;
+    pe.style.top='40%';pe.style.left='50%';pe.style.transform='translate(-50%,-50%)';
+    document.body.appendChild(pe);
+    setTimeout(()=>pe.remove(),2000);
+    setTimeout(()=>{
+      const m=document.createElement('div');
+      m.className='poetry-complete';
+      m.textContent='这首小诗，只为你存在过一秒钟。';
+      m.style.fontSize='clamp(.9rem,2.5vw,1.3rem)';m.style.color='rgba(255,245,238,.5)';
+      m.style.top='52%';m.style.left='50%';m.style.transform='translate(-50%,-50%)';
+      document.body.appendChild(m);
+      setTimeout(()=>m.remove(),3000);
+    },600);
+  },300);
+
+  if(state.poetryMatched.size>=1&&!state.flowersFound.has('lavender'))
+    setTimeout(()=>spawnFlowerVisual('lavender',window.innerWidth*.22,window.innerHeight*.35),1400);
+}
+
+/* ── Screen 5: Constellation ── */
+// 15 total: 3 letter groups + decor
+const CONST_STARS = [
+  // J — vertical + bottom-left hook (3 key)
+  {x:.16, y:.24, key:true, g:'J'},   // 0: J top
+  {x:.16, y:.56, key:true, g:'J'},   // 1: J bottom
+  {x:.12, y:.56, key:true, g:'J'},   // 2: J hook tip
+
+  // Y — V + stem (4 key)
+  {x:.36, y:.22, key:true, g:'Y'},   // 3: Y left arm
+  {x:.54, y:.22, key:true, g:'Y'},   // 4: Y right arm
+  {x:.45, y:.38, key:true, g:'Y'},   // 5: Y center
+  {x:.45, y:.56, key:true, g:'Y'},   // 6: Y stem
+
+  // H — left vertical + bottom crossbar + right vertical (4 key)
+  {x:.68, y:.20, key:true, g:'H'},   // 7: H left-top
+  {x:.68, y:.56, key:true, g:'H'},   // 8: H left-bottom
+  {x:.88, y:.20, key:true, g:'H'},   // 9: H right-top
+  {x:.88, y:.56, key:true, g:'H'},   // 10: H right-bottom
+
+  // Decor (4)
+  {x:.28, y:.44, key:false},         // 11
+  {x:.60, y:.44, key:false},         // 12
+  {x:.40, y:.12, key:false},         // 13
+  {x:.80, y:.40, key:false}          // 14
+];
+
+let constLit=[], constStarElements=[], constGroups={J:[],Y:[],H:[]}, constellationInited=false;
+
+function initConstellation(){
+  if(constellationInited)return;
+  constellationInited=true;
+  state.constellationComplete=false;
+  constLit=[]; constGroups={J:[],Y:[],H:[]};
+  const container=$('constellation-container');
+  const w=container.clientWidth||window.innerWidth;
+  const h=container.clientHeight||window.innerHeight;
+
+  container.querySelectorAll('.constellation-star').forEach(el=>el.remove());
+  constellationCanvas.width=w;constellationCanvas.height=h;
+  constCtx.clearRect(0,0,w,h);
+
+  CONST_STARS.forEach((s,i)=>{
+    const el=document.createElement('div');
+    el.className='constellation-star'+(s.key?' key':'');
+    el.style.left=(s.x*w)+'px';el.style.top=(s.y*h)+'px';
+    el.dataset.index=i;
+    const dot=document.createElement('div');
+    dot.className='dot';
+    el.appendChild(dot);
+    el.addEventListener('click',()=>clickConstStar(i));
+    container.appendChild(el);
+    constStarElements.push(el);
+  });
+
+  constellationCompleteText.classList.remove('show','fade-out');
+  constellationCompleteText.style.opacity='0';
+  const hint=container.querySelector('.constellation-hint');
+  if(hint)hint.classList.remove('faded');
+}
+
+function clickConstStar(index){
+  if(state.constellationComplete){
+    if(CONST_STARS[index].key) sparkKeyStar(index);
+    return;
+  }
+  const s=CONST_STARS[index];
+  if(!s.key) return;                    // decor stars ignored
+  if(constLit.includes(index)) return;  // already lit
+
+  const g=s.g; // 'J','Y','H'
+  // Must complete groups in order: J→Y→H
+  if(g==='J' && constLit.length>=3) return;
+  if(g==='Y' && constLit.length<3) { wrongTry(index); return; }
+  if(g==='Y' && constLit.length>=7) return;
+  if(g==='H' && constLit.length<7) { wrongTry(index); return; }
+
+  // Correct!
+  litStar(index);
+  constLit.push(index);
+  constGroups[g].push(index);
+  spawnConstRevealSpark(constStarElements[index]);
+
+  // Check group completion
+  if(g==='J' && constGroups.J.length>=3) drawJShape();
+  if(g==='Y' && constGroups.Y.length>=4) drawYShape();
+  if(g==='H' && constGroups.H.length>=4) drawHShape();
+
+  // All 12 key stars done
+  if(constLit.length>=11){
+    state.constellationComplete=true;
+    onConstellationComplete();
+  }
+
+  // Fade hint after first click
+  if(constLit.length===1){
+    const hint=document.querySelector('.constellation-hint');
+    if(hint)hint.classList.add('faded');
+  }
+}
+
+function wrongTry(index){
+  constStarElements[index].classList.add('wrong');
+  setTimeout(()=>constStarElements[index].classList.remove('wrong'),420);
+}
+
+function litStar(index){
+  constStarElements[index].classList.add('lit');
+}
+
+function drawJShape(){
+  const w=constellationCanvas.width,h=constellationCanvas.height;
+  constCtx.strokeStyle='rgba(200,210,240,.25)';
+  constCtx.lineWidth=1.2;
+  constCtx.shadowColor='rgba(200,210,240,.1)';
+  constCtx.shadowBlur=6;
+  drawPath([0,1,2]);
+}
+
+function drawYShape(){
+  const w=constellationCanvas.width,h=constellationCanvas.height;
+  constCtx.strokeStyle='rgba(200,210,240,.25)';
+  constCtx.lineWidth=1.2;
+  constCtx.shadowColor='rgba(200,210,240,.1)';
+  constCtx.shadowBlur=6;
+  drawLine(3,5); drawLine(4,5); drawLine(5,6);
+}
+
+function drawHShape(){
+  const w=constellationCanvas.width,h=constellationCanvas.height;
+  constCtx.strokeStyle='rgba(200,210,240,.25)';
+  constCtx.lineWidth=1.2;
+  constCtx.shadowColor='rgba(200,210,240,.1)';
+  constCtx.shadowBlur=6;
+  drawLine(7,8); drawLine(8,10); drawLine(9,10);
+}
+
+function drawLine(i,j){
+  const w=constellationCanvas.width,h=constellationCanvas.height;
+  const a=CONST_STARS[i], b=CONST_STARS[j];
+  constCtx.beginPath();
+  constCtx.moveTo(a.x*w,a.y*h);
+  constCtx.lineTo(b.x*w,b.y*h);
+  constCtx.stroke();
+}
+
+function drawPath(indices){
+  const w=constellationCanvas.width,h=constellationCanvas.height;
+  constCtx.beginPath();
+  constCtx.moveTo(CONST_STARS[indices[0]].x*w,CONST_STARS[indices[0]].y*h);
+  for(let i=1;i<indices.length;i++){
+    constCtx.lineTo(CONST_STARS[indices[i]].x*w,CONST_STARS[indices[i]].y*h);
+  }
+  constCtx.stroke();
+}
+
+function onConstellationComplete(){
+  // Convert all lines from silver to champagne gold
+  constCtx.clearRect(0,0,constellationCanvas.width,constellationCanvas.height);
+  constCtx.strokeStyle='rgba(212,175,55,.5)';
+  constCtx.lineWidth=2;
+  constCtx.shadowColor='rgba(212,175,55,.25)';
+  constCtx.shadowBlur=12;
+  drawPath([0,1,2]);
+  drawLine(3,5); drawLine(4,5); drawLine(5,6);
+  drawLine(7,8); drawLine(8,10); drawLine(9,10);
+  constCtx.shadowBlur=0;
+
+  // Widen glow on all key stars
+  constStarElements.forEach((el,i)=>{
+    if(CONST_STARS[i].key){
+      el.style.transition='all 1.2s ease';
+      el.querySelector('.dot').style.boxShadow='0 0 30px rgba(255,215,0,.4),0 0 60px rgba(255,200,150,.15)';
+    }
+  });
+
+  setTimeout(()=>{
+    constellationCompleteText.classList.add('show');
+    setTimeout(()=>{
+      constellationCompleteText.classList.remove('show');
+      constellationCompleteText.classList.add('fade-out');
+      const rect=constellationCompleteText.getBoundingClientRect();
+      for(let i=0;i<12;i++){
+        const sp=document.createElement('div');
+        sp.className='constellation-spark';
+        sp.textContent=['✦','✧','⋆','·'][Math.floor(Math.random()*4)];
+        const a=Math.random()*Math.PI*2;const d=40+Math.random()*100;
+        sp.style.setProperty('--sx',Math.cos(a)*d+'px');
+        sp.style.setProperty('--sy',Math.sin(a)*d+'px');
+        sp.style.left=(rect.left+rect.width/2)+'px';
+        sp.style.top=(rect.top+rect.height/2)+'px';
+        sp.style.color='#d4af37';
+        document.body.appendChild(sp);
+        setTimeout(()=>sp.remove(),800);
+      }
+    }, 4000);
+  }, 600);
+
+  if(!state.flowersFound.has('stardust')){
+    setTimeout(()=>{
+      const el=constStarElements[6];
+      const r=el.getBoundingClientRect();
+      spawnFlowerVisual('stardust',r.left+r.width/2,r.top+r.height/2);
+    },800);
+  }
+}
+
+function spawnConstRevealSpark(el){
+  const r=el.getBoundingClientRect();
+  for(let i=0;i<3;i++){
+    const sp=document.createElement('div');
+    sp.className='constellation-spark';
+    sp.textContent='✦';
+    const a=Math.random()*Math.PI*2;const d=12+Math.random()*20;
+    sp.style.setProperty('--sx',Math.cos(a)*d+'px');
+    sp.style.setProperty('--sy',Math.sin(a)*d+'px');
+    sp.style.left=(r.left+r.width/2)+'px';
+    sp.style.top=(r.top+r.height/2)+'px';
+    sp.style.color='rgba(255,215,0,.5)';
+    document.body.appendChild(sp);
+    setTimeout(()=>sp.remove(),800);
+  }
+}
+
+function sparkKeyStar(index){
+  const el=constStarElements[index];
+  if(!el)return;
+  const r=el.getBoundingClientRect();
+  for(let i=0;i<5;i++){
+    const sp=document.createElement('div');
+    sp.className='constellation-spark';
+    sp.textContent=['✦','✧','⋆'][Math.floor(Math.random()*3)];
+    const a=Math.random()*Math.PI*2;const d=20+Math.random()*35;
+    sp.style.setProperty('--sx',Math.cos(a)*d+'px');
+    sp.style.setProperty('--sy',Math.sin(a)*d+'px');
+    sp.style.left=(r.left+r.width/2)+'px';
+    sp.style.top=(r.top+r.height/2)+'px';
+    sp.style.color='#d4af37';
+    document.body.appendChild(sp);
+    setTimeout(()=>sp.remove(),800);
+  }
+  try{
+    const AC=window.AudioContext||window.webkitAudioContext;
+    if(!state.audioCtx)state.audioCtx=new AC();
+    const ac=state.audioCtx;
+    if(ac.state==='suspended')ac.resume();
+    const o=ac.createOscillator(),g=ac.createGain();
+    o.type='sine';o.frequency.value=880+Math.random()*440;
+    g.gain.setValueAtTime(.02,ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.8);
+    o.connect(g);g.connect(ac.destination);
+    o.start(ac.currentTime);o.stop(ac.currentTime+.8);
+  }catch(e){}
+}
+
+/* ── Screen 6: Final Letter ── */
+let finalStarClicks = 0;
+let starUnfolding = false;
+const starHollow = $('star-hollow');
+const replyConfirm = $('reply-confirm');
+const destinedLine = $('destined-line');
+
+function initFinalScreen(){
+  if(state.finalScreenInited)return;
+  state.finalScreenInited=true;
+
+  state.currentQuoteIndex=Math.floor(Math.random()*QUOTES.length);
+  letterQuote.textContent=QUOTES[state.currentQuoteIndex];
+  letter.classList.remove('open');
+  replyConfirm.classList.remove('show');
+  destinedLine.classList.remove('show');
+  starHollow.classList.remove('filled');
+  finalStarClicks = 0;
+  starUnfolding = false;
+
+  // Reset star to gentle heartbeat
+  finalStar.classList.remove('tremble','unfolding');
+  finalStar.classList.add('heartbeat');
+  finalStar.style.display = '';
+  finalStar.style.opacity = '';
+
+  // Click handler for the star
+  finalStar.addEventListener('click', starClickHandler);
+}
+
+function starClickHandler(){
+  if(starUnfolding) return;
+  finalStarClicks++;
+
+  if(finalStarClicks === 1){
+    // First click: tremble, then return to heartbeat
+    finalStar.classList.remove('heartbeat');
+    finalStar.classList.add('tremble');
+    setTimeout(() => {
+      if(!starUnfolding){
+        finalStar.classList.remove('tremble');
+        finalStar.classList.add('heartbeat');
+      }
+    }, 650);
+    return;
+  }
+
+  if(finalStarClicks >= 2){
+    // Second click: unfold
+    starUnfolding = true;
+    finalStar.removeEventListener('click', starClickHandler);
+    finalStar.classList.remove('heartbeat','tremble');
+    finalStar.classList.add('unfolding');
+
+    // After unfold completes (3s), show letter
+    setTimeout(() => {
+      finalStar.style.display = 'none';
+      letter.classList.add('open');
+      state.letterOpen = true;
+      setTimeout(() => {
+        destinedLine.classList.add('show');
+      }, 2000);
+    }, 3100);
+  }
+}
+
+// Quote switching
+letterBtn.addEventListener('click',function(){
+  state.currentQuoteIndex=(state.currentQuoteIndex+1)%QUOTES.length;
+  letterQuote.style.opacity='0';
+  letterQuote.style.transform='translateY(8px)';
+  setTimeout(()=>{
+    letterQuote.textContent=QUOTES[state.currentQuoteIndex];
+    requestAnimationFrame(()=>{
+      letterQuote.style.opacity='1';
+      letterQuote.style.transform='translateY(0)';
+    });
+  },300);
+});
+
+// Hollow star reply
+starHollow.addEventListener('click', function(){
+  if(starHollow.classList.contains('filled')) return;
+  starHollow.classList.add('filled');
+  setTimeout(() => {
+    replyConfirm.classList.add('show');
+  }, 400);
+});
+
+/* ── BGM Player ── */
+const musicBtn = $('music-btn');
+const bgmAudio = $('bgm');
+bgmAudio.volume = 0.15;
+
+musicBtn.addEventListener('click', function(){
+  if(bgmAudio.paused){
+    bgmAudio.play();
+    musicBtn.classList.add('playing', 'active');
+    musicBtn.textContent = '♫';
+  } else {
+    bgmAudio.pause();
+    musicBtn.classList.remove('playing', 'active');
+    musicBtn.textContent = '♪';
+  }
+});
+
+// Auto-play immediately on page load
+function autoPlayBGM(){
+  bgmAudio.play().then(() => {
+    musicBtn.classList.add('playing', 'active');
+    musicBtn.textContent = '♫';
+  }).catch(() => {
+    // Browser blocked — play on first touch instead
+    const playOnTouch = () => {
+      bgmAudio.play();
+      musicBtn.classList.add('playing', 'active');
+      musicBtn.textContent = '♫';
+      document.removeEventListener('pointerdown', playOnTouch);
+      document.removeEventListener('touchstart', playOnTouch);
+    };
+    document.addEventListener('pointerdown', playOnTouch, {once: true});
+    document.addEventListener('touchstart', playOnTouch, {once: true, passive: true});
+  });
+}
+autoPlayBGM();
+
+/* ── Easter egg: flower collection ── */
+
+function spawnFlowerVisual(name, cx, cy){
+  if(state.flowersFound.has(name)) return;
+  const f = FLOWERS.find(x => x.id === name);
+  if(!f) return;
+
+  const el = document.createElement('div');
+  el.className = 'flwr';
+  el.style.left = (cx - 22) + 'px';
+  el.style.top = (cy - 22) + 'px';
+  el.dataset.flwr = name;
+
+  const inner = document.createElement('div');
+  inner.className = 'flwr-inner';
+  inner.textContent = f.emoji;
+
+  const glow = document.createElement('div');
+  glow.className = 'flwr-glow';
+  glow.style.background = `radial-gradient(circle, ${f.color} 0%, transparent 70%)`;
+  inner.appendChild(glow);
+  el.appendChild(inner);
+
+  document.body.appendChild(el);
+
+  // Show with gentle entrance
+  requestAnimationFrame(() => {
+    el.classList.add('show');
+    el.classList.add('flwr-sway');
+  });
+
+  // Light sparkle on appear
+  spawnFlwrSpark(cx, cy, f.color);
+
+  // Click to collect — use pointerdown for mobile reliability
+  el.addEventListener('pointerdown', function(e){
+    e.preventDefault();
+    e.stopPropagation();
+    collectFlower(name, this);
+  });
+
+  // Auto collect after 8s if not clicked
+  setTimeout(() => {
+    if(el.parentNode && !el.dataset.collected){
+      collectFlower(name, el);
+    }
+  }, 8000);
+}
+
+function spawnFlwrSpark(cx, cy, color){
+  for(let i=0;i<5;i++){
+    const sp = document.createElement('div');
+    sp.className = 'flwr-spark';
+    const a = Math.random() * Math.PI * 2;
+    const d = 20 + Math.random() * 30;
+    sp.style.setProperty('--sx', Math.cos(a) * d + 'px');
+    sp.style.setProperty('--sy', Math.sin(a) * d + 'px');
+    sp.style.left = cx + 'px';
+    sp.style.top = cy + 'px';
+    sp.style.width = (2 + Math.random() * 3) + 'px';
+    sp.style.height = sp.style.width;
+    sp.style.background = color;
+    sp.style.boxShadow = `0 0 6px ${color}`;
+    document.body.appendChild(sp);
+    setTimeout(() => sp.remove(), 700);
+  }
+}
+
+function collectFlower(name, el){
+  if(state.flowersFound.has(name) || el.dataset.collected) return;
+  el.dataset.collected = '1';
+  state.flowersFound.add(name);
+
+  // Animate flying to wreath via Web Animations API — no CSS conflicts
+  const rect = el.getBoundingClientRect();
+  const wrRect = wreathIcon.getBoundingClientRect();
+  const fx = wrRect.left - rect.left + wrRect.width/2 - rect.width/2;
+  const fy = wrRect.top - rect.top + wrRect.height/2 - rect.height/2;
+
+  // Park the element at current visual position first
+  el.style.left = rect.left + 'px';
+  el.style.top = rect.top + 'px';
+  el.style.width = rect.width + 'px';
+  el.style.height = rect.height + 'px';
+  el.classList.remove('flwr-sway', 'show');
+  el.style.transform = 'none';
+  el.style.transition = 'none';
+
+  // Use WAAPI — always reliable
+  el.animate([
+    { transform: 'translate(0,0) scale(1)', opacity: 1 },
+    { transform: `translate(${fx}px, ${fy}px) scale(.15)`, opacity: 0 }
+  ], {
+    duration: 900,
+    easing: 'cubic-bezier(.4,0,.2,1)',
+    fill: 'forwards'
+  }).onfinish = () => {
+    if(el.parentNode) el.remove();
+  };
+
+  // Update wreath
+  const f = FLOWERS.find(x => x.id === name);
+  if(f){
+    const idx = FLOWERS.indexOf(f);
+    const wrItem = wreathIcon.querySelector(`[data-flw="${idx}"]`);
+    if(wrItem){
+      wrItem.textContent = f.emoji;
+      wrItem.classList.add('found');
+    }
+  }
+
+  // Wreath glow pulse
+  wreathIcon.style.transition = 'none';
+  wreathIcon.style.transform = 'scale(1.15)';
+  requestAnimationFrame(() => {
+    wreathIcon.style.transition = 'transform .5s cubic-bezier(.34,1.56,.64,1)';
+    wreathIcon.style.transform = 'scale(1)';
+  });
+
+  // Completion check — 4 flowers is enough
+  if(state.flowersFound.size >= 4){
+    setTimeout(() => {
+      wreathIcon.classList.add('complete');
+      const msg = document.createElement('div');
+      msg.className = 'wreath-complete-msg';
+      msg.textContent = '你看，温柔是会被发现的。';
+      document.body.appendChild(msg);
+
+      // After 2.5s, burst into stars flying to wreath
+      setTimeout(() => {
+        const wr = wreathIcon.getBoundingClientRect();
+        const emojis = ['🌼','🌸','🪷','✧','❀'];
+        for(let i=0;i<5;i++){
+          const star = document.createElement('div');
+          star.style.cssText = `position:fixed;z-index:51;pointer-events:none;font-size:clamp(1rem,2.8vw,1.5rem);transition:all 1.2s cubic-bezier(.4,0,.2,1);top:${35+(i-2)*10}%;left:${50+(i-2)*16}%;opacity:1;transform:scale(1)`;
+          star.textContent = emojis[i];
+          document.body.appendChild(star);
+          requestAnimationFrame(()=>{
+            star.style.top = wr.top + 'px';
+            star.style.left = wr.left + 'px';
+            star.style.opacity = '0';
+            star.style.transform = 'scale(0) rotate(180deg)';
+          });
+          setTimeout(() => star.remove(), 1500);
+        }
+        msg.remove();
+      }, 2500);
+    }, 500);
+  }
+}
+
+/* ── Trigger 1: 月光白 — Greeting 3s stay ── */
+let greetingStayTimer = null;
+const greetingSection = sections[0];
+const greetingObs = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting && entry.intersectionRatio > .5){
+      if(!state.greetingStayCounted){
+        greetingStayTimer = setTimeout(() => {
+          if(!state.flowersFound.has('moonwhite')){
+            state.greetingStayCounted = true;
+            // Petal falls from top-left
+            const sp = document.createElement('div');
+            sp.className = 'golden-star';
+            sp.textContent = '🌼';
+            sp.style.left = '8%';
+            sp.style.top = '-30px';
+            sp.style.fontSize = 'clamp(1.2rem,3vw,1.8rem)';
+            sp.style.color = 'rgba(255,250,245,.9)';
+            sp.style.zIndex = '50';
+            sp.style.setProperty('--fall-dur','4s');
+            document.body.appendChild(sp);
+            setTimeout(() => sp.remove(), 4500);
+            // Show flower where petal lands
+            setTimeout(() => {
+              spawnFlowerVisual('moonwhite', window.innerWidth * .12, window.innerHeight * .35);
+            }, 3500);
+          }
+        }, 3000);
+      }
+    } else {
+      clearTimeout(greetingStayTimer);
+    }
+  });
+}, { threshold: .5 });
+greetingObs.observe(greetingSection);
+
+/* ── Trigger 2: 香槟粉 — Cake candle click, near flame ── */
+// Called from cake click handler below
+
+/* ── Trigger 3: 淡紫色 — Poem complete, mixed in starburst ── */
+// Called from showPoemComplete below
+
+/* ── Trigger 4: 星尘金 — Constellation complete, brightest star ── */
+// Called from constellation completion
+
+/* ── Trigger 5: 晨雾蓝 — 3 quick swipes on any screen ── */
+let swipeDir = 0;
+let swipeLastTop = 0;
+let swipeResetTimer = null;
+
+function trackSwipe(){
+  const st = scrollContainer.scrollTop;
+  const now = Date.now();
+  const diff = st - swipeLastTop;
+  const newDir = diff > 2 ? 1 : (diff < -2 ? -1 : 0);
+
+  if(Math.abs(diff) > 40 && newDir !== 0 && newDir !== swipeDir){
+    if(swipeDir !== 0){
+      // Direction changed — count a full swipe
+      state.swipeUpCount++;
+      clearTimeout(swipeResetTimer);
+      swipeResetTimer = setTimeout(() => {
+        state.swipeUpCount = 0;
+        swipeDir = 0;
+      }, 3000);
+
+      if(state.swipeUpCount >= 3 && !state.flowersFound.has('mistblue')){
+        state.swipeUpCount = 0;
+        clearTimeout(swipeResetTimer);
+        setTimeout(() => {
+          spawnFlowerVisual('mistblue', window.innerWidth/2, window.innerHeight * .85);
+        }, 400);
+      }
+    }
+    swipeDir = newDir;
+  }
+  swipeLastTop = st;
+}
+
+/* ── Audio init on interaction ── */
+function initAudio(){
+  if(!state.audioCtx){
+    try{
+      const AC=window.AudioContext||window.webkitAudioContext;
+      state.audioCtx=new AC();
+    }catch(e){}
+  }
+}
+document.addEventListener('pointerdown',initAudio,{once:true});
+document.addEventListener('touchstart',initAudio,{once:true,passive:true});
+
+/* ── Resize ── */
+function resize(){
+  starCanvas.width=window.innerWidth;
+  starCanvas.height=window.innerHeight;
+  petalCanvas.width=window.innerWidth;
+  petalCanvas.height=window.innerHeight;
+  initStars();
+}
+window.addEventListener('resize',debounce(resize,200));
+
+function debounce(fn,ms){let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms)}}
+
+let scrollPrevTop = 0;
+
+/* ── Main loop ── */
+function animate(time){
+  const st=scrollContainer.scrollTop;
+  const now=performance.now();
+  const dt=now-state.lastScrollTime;
+  const scrollVel=dt>0?Math.abs(st-scrollPrevTop)/dt:0;
+  state.scrollTop=st;
+  state.lastScrollTime=now;
+  scrollPrevTop=st;
+
+  drawStars(time,scrollVel);
+  updatePetals();
+  drawPetals();
+  trackSwipe();
+  requestAnimationFrame(animate);
+}
+
+/* ── Init ── */
+function init(){
+  resize();
+  animate(0);
+  startPetalSpawner();
+  console.log('✦ birthday — scroll-snap edition ✦');
+}
+
+if(document.readyState==='loading')
+  document.addEventListener('DOMContentLoaded',init);
+else init();
+})();
+</script>
+</body>
+</html>
