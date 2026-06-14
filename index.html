@@ -106,8 +106,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#060a1f;font-family:
 .poetry-petal.dragging{z-index:20;cursor:grabbing;box-shadow:0 12px 40px rgba(0,0,0,.25);transform:scale(1.08)}
 .poetry-petal.matched{animation:petalMerge .8s ease forwards}
 @keyframes petalMerge{0%{transform:scale(1.1);opacity:1}50%{transform:scale(1.3);opacity:.7}100%{transform:scale(0);opacity:0}}
-.poetry-complete{position:fixed;z-index:50;font-family:'Dancing Script',cursive;text-align:center;color:#d4af37;font-size:clamp(1.2rem,3.5vw,1.8rem);text-shadow:0 0 40px rgba(212,175,55,.3);animation:poemAppear 1.5s ease forwards;pointer-events:none}
-@keyframes poemAppear{0%{opacity:0;transform:scale(.5) translateY(20px)}40%{opacity:1;transform:scale(1.05) translateY(0)}100%{opacity:0;transform:scale(1.2) translateY(-30px)}}
+.poetry-complete{position:fixed;z-index:50;font-family:'Dancing Script',cursive;text-align:center;color:#d4af37;font-size:clamp(1.2rem,3.5vw,1.8rem);text-shadow:0 0 40px rgba(212,175,55,.3);animation:poemAppear 3.5s ease forwards;pointer-events:none}
+@keyframes poemAppear{0%{opacity:0;transform:scale(.5) translateY(20px)}25%{opacity:1;transform:scale(1.05) translateY(0)}65%{opacity:1;transform:scale(1) translateY(-5px)}100%{opacity:0;transform:scale(.6) translateY(-40px)}}
 .star-burst{position:fixed;z-index:50;pointer-events:none;font-size:1.2rem;animation:starFly 1.2s ease forwards}
 @keyframes starFly{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(0)}}
 
@@ -958,7 +958,7 @@ function showPoemComplete(petal,match){
     pe.textContent=`「${fullPoem.a} ${fullPoem.b}」`;
     pe.style.top='40%';pe.style.left='50%';pe.style.transform='translate(-50%,-50%)';
     document.body.appendChild(pe);
-    setTimeout(()=>pe.remove(),2000);
+    setTimeout(()=>pe.remove(),3000);
     setTimeout(()=>{
       const m=document.createElement('div');
       m.className='poetry-complete';
@@ -966,7 +966,7 @@ function showPoemComplete(petal,match){
       m.style.fontSize='clamp(.9rem,2.5vw,1.3rem)';m.style.color='rgba(255,245,238,.5)';
       m.style.top='52%';m.style.left='50%';m.style.transform='translate(-50%,-50%)';
       document.body.appendChild(m);
-      setTimeout(()=>m.remove(),3000);
+      setTimeout(()=>m.remove(),4000);
     },600);
   },300);
 
