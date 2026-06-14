@@ -1429,32 +1429,37 @@ function collectFlower(name, el){
   el.dataset.collected = '1';
   state.flowersFound.add(name);
 
-  // Animate flying to wreath via Web Animations API — no CSS conflicts
+  // Kill CSS animation FIRST to get real position
+  el.classList.remove('flwr-sway', 'show');
+  el.style.transform = 'none';
+  el.style.transition = 'none';
+  void el.offsetHeight; // force reflow
+
+  // Now read correct position
   const rect = el.getBoundingClientRect();
   const wrRect = wreathIcon.getBoundingClientRect();
   const fx = wrRect.left - rect.left + wrRect.width/2 - rect.width/2;
   const fy = wrRect.top - rect.top + wrRect.height/2 - rect.height/2;
 
-  // Park the element at current visual position first
+  // Park
   el.style.left = rect.left + 'px';
   el.style.top = rect.top + 'px';
   el.style.width = rect.width + 'px';
   el.style.height = rect.height + 'px';
-  el.classList.remove('flwr-sway', 'show');
-  el.style.transform = 'none';
-  el.style.transition = 'none';
 
-  // Use WAAPI — always reliable
-  el.animate([
+  // Animate to wreath via WAAPI
+  const anim = el.animate([
     { transform: 'translate(0,0) scale(1)', opacity: 1 },
     { transform: `translate(${fx}px, ${fy}px) scale(.15)`, opacity: 0 }
   ], {
     duration: 900,
     easing: 'cubic-bezier(.4,0,.2,1)',
     fill: 'forwards'
-  }).onfinish = () => {
-    if(el.parentNode) el.remove();
-  };
+  });
+  anim.onfinish = () => { if(el.parentNode) el.remove(); };
+  // Fallback: remove after animation time
+  setTimeout(() => { if(el.parentNode) el.remove(); }, 1000);
+  el.style.pointerEvents = 'none';
 
   // Update wreath
   const f = FLOWERS.find(x => x.id === name);
