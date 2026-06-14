@@ -988,17 +988,18 @@ const CONST_STARS = [
   {x:.45, y:.38, key:true, g:'Y'},   // 5: Y center
   {x:.45, y:.56, key:true, g:'Y'},   // 6: Y stem
 
-  // H — left vertical + bottom crossbar + right vertical (4 key)
-  {x:.68, y:.20, key:true, g:'H'},   // 7: H left-top
-  {x:.68, y:.56, key:true, g:'H'},   // 8: H left-bottom
-  {x:.88, y:.20, key:true, g:'H'},   // 9: H right-top
-  {x:.88, y:.56, key:true, g:'H'},   // 10: H right-bottom
+  // H — 左竖3点 + 右竖3点 + 中间横线 (6 key)
+  {x:.68, y:.20, key:true, g:'H'},   // 7: 左竖上
+  {x:.68, y:.38, key:true, g:'H'},   // 8: 左竖中
+  {x:.68, y:.56, key:true, g:'H'},   // 9: 左竖下
+  {x:.88, y:.20, key:true, g:'H'},   // 10: 右竖上
+  {x:.88, y:.38, key:true, g:'H'},   // 11: 右竖中
+  {x:.88, y:.56, key:true, g:'H'},   // 12: 右竖下
 
-  // Decor (4)
-  {x:.28, y:.44, key:false},         // 11
-  {x:.60, y:.44, key:false},         // 12
-  {x:.40, y:.12, key:false},         // 13
-  {x:.80, y:.40, key:false}          // 14
+  // Decor (3)
+  {x:.28, y:.44, key:false},         // 13
+  {x:.60, y:.44, key:false},         // 14
+  {x:.40, y:.12, key:false}          // 15
 ];
 
 let constLit=[], constStarElements=[], constGroups={J:[],Y:[],H:[]}, constellationInited=false;
@@ -1060,10 +1061,10 @@ function clickConstStar(index){
   // Check group completion
   if(g==='J' && constGroups.J.length>=3) drawJShape();
   if(g==='Y' && constGroups.Y.length>=4) drawYShape();
-  if(g==='H' && constGroups.H.length>=4) drawHShape();
+  if(g==='H' && constGroups.H.length>=6) drawHShape();
 
-  // All 12 key stars done
-  if(constLit.length>=11){
+  // All 13 key stars done
+  if(constLit.length>=13){
     state.constellationComplete=true;
     onConstellationComplete();
   }
@@ -1108,7 +1109,7 @@ function drawHShape(){
   constCtx.lineWidth=1.2;
   constCtx.shadowColor='rgba(200,210,240,.1)';
   constCtx.shadowBlur=6;
-  drawLine(7,8); drawLine(8,10); drawLine(9,10);
+  drawLine(7,8); drawLine(8,9); drawLine(10,11); drawLine(11,12); drawLine(8,11);
 }
 
 function drawLine(i,j){
@@ -1139,7 +1140,7 @@ function onConstellationComplete(){
   constCtx.shadowBlur=12;
   drawPath([0,1,2]);
   drawLine(3,5); drawLine(4,5); drawLine(5,6);
-  drawLine(7,8); drawLine(8,10); drawLine(9,10);
+  drawLine(7,8); drawLine(8,9); drawLine(10,11); drawLine(11,12); drawLine(8,11);
   constCtx.shadowBlur=0;
 
   // Widen glow on all key stars
