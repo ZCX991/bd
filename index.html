@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <title>birthday</title>
 <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="preload" href="bgm.mp3" as="audio">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{width:100%;height:100%;overflow:hidden;background:#060a1f;font-family:'Cormorant Garamond',serif;color:#fff5ee;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
@@ -1324,6 +1325,19 @@ const musicBtn = $('music-btn');
 const bgmAudio = $('bgm');
 bgmAudio.volume = 0.15;
 
+// Preload entire file into memory so playback never buffers
+let bgmBlobReady = false;
+fetch('bgm.mp3').then(r => {
+  const len = r.headers.get('content-length');
+  if(len) bgmAudio.preload = 'auto';
+  return r.blob();
+}).then(blob => {
+  URL.createObjectURL(blob);
+  bgmAudio.src = URL.createObjectURL(blob);
+  bgmAudio.load();
+  bgmBlobReady = true;
+}).catch(() => {/* keep original src as fallback */});
+
 musicBtn.addEventListener('click', function(){
   if(bgmAudio.paused){
     bgmAudio.play();
@@ -1336,23 +1350,24 @@ musicBtn.addEventListener('click', function(){
   }
 });
 
-// Auto-play immediately on page load
 function autoPlayBGM(){
-  bgmAudio.play().then(() => {
-    musicBtn.classList.add('playing', 'active');
-    musicBtn.textContent = '♫';
-  }).catch(() => {
-    // Browser blocked — play on first touch instead
-    const playOnTouch = () => {
-      bgmAudio.play();
+  // Wait 1s for blob preload to begin, then try playing
+  setTimeout(() => {
+    bgmAudio.play().then(() => {
       musicBtn.classList.add('playing', 'active');
       musicBtn.textContent = '♫';
-      document.removeEventListener('pointerdown', playOnTouch);
-      document.removeEventListener('touchstart', playOnTouch);
-    };
-    document.addEventListener('pointerdown', playOnTouch, {once: true});
-    document.addEventListener('touchstart', playOnTouch, {once: true, passive: true});
-  });
+    }).catch(() => {
+      const playOnTouch = () => {
+        bgmAudio.play();
+        musicBtn.classList.add('playing', 'active');
+        musicBtn.textContent = '♫';
+        document.removeEventListener('pointerdown', playOnTouch);
+        document.removeEventListener('touchstart', playOnTouch);
+      };
+      document.addEventListener('pointerdown', playOnTouch, {once: true});
+      document.addEventListener('touchstart', playOnTouch, {once: true, passive: true});
+    });
+  }, 1000);
 }
 autoPlayBGM();
 
