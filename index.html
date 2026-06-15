@@ -1324,19 +1324,7 @@ starHollow.addEventListener('click', function(){
 const musicBtn = $('music-btn');
 const bgmAudio = $('bgm');
 bgmAudio.volume = 0.15;
-
-// Preload entire file into memory so playback never buffers
-let bgmBlobReady = false;
-fetch('bgm.mp3').then(r => {
-  const len = r.headers.get('content-length');
-  if(len) bgmAudio.preload = 'auto';
-  return r.blob();
-}).then(blob => {
-  URL.createObjectURL(blob);
-  bgmAudio.src = URL.createObjectURL(blob);
-  bgmAudio.load();
-  bgmBlobReady = true;
-}).catch(() => {/* keep original src as fallback */});
+bgmAudio.preload = 'auto';
 
 musicBtn.addEventListener('click', function(){
   if(bgmAudio.paused){
@@ -1351,23 +1339,20 @@ musicBtn.addEventListener('click', function(){
 });
 
 function autoPlayBGM(){
-  // Wait 1s for blob preload to begin, then try playing
-  setTimeout(() => {
-    bgmAudio.play().then(() => {
+  bgmAudio.play().then(() => {
+    musicBtn.classList.add('playing', 'active');
+    musicBtn.textContent = '♫';
+  }).catch(() => {
+    const playOnTouch = () => {
+      bgmAudio.play();
       musicBtn.classList.add('playing', 'active');
       musicBtn.textContent = '♫';
-    }).catch(() => {
-      const playOnTouch = () => {
-        bgmAudio.play();
-        musicBtn.classList.add('playing', 'active');
-        musicBtn.textContent = '♫';
-        document.removeEventListener('pointerdown', playOnTouch);
-        document.removeEventListener('touchstart', playOnTouch);
-      };
-      document.addEventListener('pointerdown', playOnTouch, {once: true});
-      document.addEventListener('touchstart', playOnTouch, {once: true, passive: true});
-    });
-  }, 1000);
+      document.removeEventListener('pointerdown', playOnTouch);
+      document.removeEventListener('touchstart', playOnTouch);
+    };
+    document.addEventListener('pointerdown', playOnTouch, {once: true});
+    document.addEventListener('touchstart', playOnTouch, {once: true, passive: true});
+  });
 }
 autoPlayBGM();
 
